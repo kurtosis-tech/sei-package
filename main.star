@@ -58,7 +58,7 @@ def launch_builder(plan, cluster_size):
                 "/tmp/cloner": cloner,
                 "/tmp/configurer": configurer,
                 "/tmp/genesis": genesis,
-                "/tmp/builder.sh": genesis,
+                "/tmp/builder": genesis,
             },
             env_vars = {
                 "CLUSTER_SIZE": str(cluster_size)
@@ -76,7 +76,7 @@ def launch_builder(plan, cluster_size):
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["/tmp/builder.sh"]
+            command = ["/tmp/builder/builder.sh"]
         )
     )
 
