@@ -98,7 +98,7 @@ def launch_builder(plan, cluster_size):
 
     built = plan.store_service_files(
         service_name = "builder",
-        src = "/sei-platform/sei-chain"
+        src = "/sei-protocol/sei-chain"
     )
 
     plan.remove_service("builder")
