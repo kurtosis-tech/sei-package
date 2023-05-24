@@ -60,7 +60,7 @@ def run(plan , args):
         nodes = node_names.append(name)
 
         plan.exec(
-            service_name = node,
+            service_name = name,
             recipe = ExecRecipe(
                 command = ["go install", "-g", "github.com/CosmWasm/wasmvm"]
             )            
