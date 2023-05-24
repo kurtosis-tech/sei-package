@@ -52,7 +52,7 @@ def run(plan , args):
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
-                command = ["mkdir", MAIN_DIR + "/root/go/bin"],
+                command = ["mkdir", "/root/go/bin"],
             )
         )
 
