@@ -57,8 +57,6 @@ def run(plan , args):
             )
         )
 
-        nodes = node_names.append(name)
-
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
@@ -67,13 +65,15 @@ def run(plan , args):
         )
     
         output = plan.exec(
-            service_name = node,
+            service_name = name,
             recipe = ExecRecipe(
                 command = ["/usr/bin/configurer.sh"]
             )            
         )
 
         plan.print(output["output"])
+
+        nodes = node_names.append(name)        
 
     # store all build/generated/persistent_peers.txt
     # build/generated/genesis_accounts.txt
