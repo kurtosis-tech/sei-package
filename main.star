@@ -14,7 +14,10 @@ def run(plan , args):
 
     node_names = []
 
-    sied, price_feeder = build(plan)
+    cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
+    configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
+
+    sied, price_feeder = build(plan, cloner)
 
     for index in range(0, cluster_size+1):
         env_vars_for_node = {}
@@ -22,7 +25,6 @@ def run(plan , args):
         env_vars_for_node["CLUSTER_SIZE"] = str(cluster_size)
         env_vars_for_node["NUM_ACCOUNTS"] = str(num_accounts)
 
-        cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
 
         config = ServiceConfig(
             image = SEI_IMAGE,
@@ -36,11 +38,12 @@ def run(plan , args):
             },
             files = {
                 "/sei-protocol/": built,
-                "/tmp/": cloner,
+                "/tmp/cloner": cloner,
                 "/tmp/sied": sied,
                 "/tmp/feeder": price_feeder
+                "/tmp/configurer": configurer,
             },
-            cmd = ["/tmp/cloner.sh"]
+            cmd = ["/tmp/cloner/cloner.sh"]
         )
 
         name = SEI_NODE_PREFIX + str(index)        
@@ -62,11 +65,17 @@ def run(plan , args):
 
         nodes = node_names.append(name)
     
+    for node in node_names:
+        output = plan.exec(
+            service_name = node,
+            command = ["/tmp/configurer/configurer.sh"]
+        )
+
+        plan.print(output)
 
 
 # This builds everything and we throw this away
-def build(plan):
-    cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
+def build(plan, cloner):
     builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
 
     plan.add_service(
