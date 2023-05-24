@@ -76,7 +76,7 @@ def run(plan , args):
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
-                output = ["cat build/generated/genesis_accounts.txt"]
+                command = ["cat build/generated/genesis_accounts.txt"]
             )
         )
 
