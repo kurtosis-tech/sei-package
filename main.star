@@ -62,6 +62,13 @@ def run(plan , args):
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
+                command = ["mkdir", MAIN_DIR + "build/"],
+            )        
+        )        
+
+        plan.exec(
+            service_name = name,
+            recipe = ExecRecipe(
                 command = ["mv", "/tmp/seid/seid", MAIN_DIR + "build/"],
             )            
         )
