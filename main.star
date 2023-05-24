@@ -14,10 +14,9 @@ def run(plan , args):
 
     node_names = []
 
-    cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
 
-    seid, price_feeder = build(plan, cloner)
+    built = build(plan)
 
     for index in range(0, cluster_size+1):
         env_vars_for_node = {}
@@ -40,7 +39,7 @@ def run(plan , args):
                 "/tmp/cloner": cloner,
                 "/tmp/seid": seid,
                 "/tmp/feeder": price_feeder,
-                "/tmp/configurer": configurer,
+                MAIN_DIR: built
             },
             entrypoint = ["sleep", "9999999"]
         )
@@ -56,21 +55,28 @@ def run(plan , args):
             service_name = name,
             recipe = ExecRecipe(
                 command = ["/tmp/cloner/cloner.sh"],
-            )        
+            )
         )
 
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
                 command = ["mkdir", MAIN_DIR + "build/"],
-            )        
-        )        
+            )
+        )
+
+        plan.exec(
+            service_name = name,
+            recipe = ExecRecipe(
+                command = ["mkdir", MAIN_DIR + "/root/go/bin"],
+            )
+        )
 
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
                 command = ["mv", "/tmp/seid/seid", MAIN_DIR + "build/"],
-            )            
+            )
         )
 
         plan.exec(
@@ -105,7 +111,8 @@ def run(plan , args):
 
 
 # This builds everything and we throw this away
-def build(plan, cloner):
+def build(plan):
+    cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
 
     plan.add_service(
@@ -148,15 +155,9 @@ def build(plan, cloner):
         )        
     )
 
-    sied = plan.store_service_files(
+    built = plan.store_service_files(
         service_name = "builder",
-        src = MAIN_DIR + "/build/seid"
+        src = MAIN_DIR
     )
 
-    price_feeder = plan.store_service_files(
-        service_name = "builder",
-        src = MAIN_DIR + "/build/price-feeder"
-    )
-
-
-    return sied, price_feeder
+    return built
