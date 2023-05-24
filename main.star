@@ -32,6 +32,7 @@ def run(plan , args):
             },
             files = {
                 "/sei-protocol/": built,
+                "/tmp/": entrypoint,
             },
             cmd = ["/tmp/entrypoint.sh"]
         )
