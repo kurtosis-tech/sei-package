@@ -47,17 +47,16 @@ def run(plan , args):
 
         name = SEI_NODE_PREFIX + str(index)
 
+        plan.add_service(
+            name = name,
+            config = config,
+        )
+
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
                 command = ["/tmp/cloner/cloner.sh"],
             )        
-        )
-
-
-        plan.add_service(
-            name = name,
-            config = config,
         )
 
         plan.exec(
