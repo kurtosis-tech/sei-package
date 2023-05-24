@@ -142,7 +142,7 @@ def build(plan):
 
     built = plan.store_service_files(
         service_name = "builder",
-        src = MAIN_BASE
+        src = MAIN_DIR
     )
 
     return built
