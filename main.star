@@ -10,9 +10,9 @@ def run(plan , args):
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
 
-    # cloned = clone_container(plan)
+    built = clone_container(plan)
 
-    for index in range(0, cluster_size):
+    for index in range(0, cluster_size+1):
         env_vars_for_node = {}
         env_vars_for_node["ID"] = str(index)
         env_vars_for_node["CLUSTER_SIZE"] = str(cluster_size)
@@ -24,14 +24,14 @@ def run(plan , args):
             image = SEI_IMAGE,
             env_vars = env_vars_for_node,
             ports = {
-                "prometheus": PortSpec(number = 9090, wait = None),
+                "prometheus": PortSpec(number = 9090, wait = "6000s"),
                 "grpc-web": PortSpec(number = 9091, wait = None),
                 "tendermint-p2p": PortSpec(number = 26656, wait = None),
                 "tendermint-rpc": PortSpec(number = 26657, wait = None),
                 "abci-app": PortSpec(number = 26658, wait = None)
             },
             files = {
-                "/tmp/": entrypoint,
+                "/sei-protocol/": built,
             },
             cmd = ["/tmp/entrypoint.sh"]
         )
@@ -42,25 +42,51 @@ def run(plan , args):
         )
 
 
-def clone_container(plan):
+# This builds everything and we throw this away
+def launch_builder(plan, cluster_size):
     plan.add_service(
-        name = "cloner",
+        name = "builder",
         config = ServiceConfig(
-            image = "alpine/git",
+            image = SEI_IMAGE,
             entrypoint = ["sleep", "999999"]
         )
     )
 
     plan.exec(
-        service_name = "cloner",
+        service_name = "builder",
         recipe = ExecRecipe(
-            command = ["git", "clone", "https://github.com/sei-protocol/sei-chain", "/tmp/sei-chain"]
+            command = ["git", "clone", "--depth=1", "https://github.com/sei-protocol/sei-chain", "/sei-platform/sei-chain"]
         )
     )
 
-    cloned = plan.store_service_files(
-        service_name = "cloner",
-        src = "/tmp/sei-chain"
+    plan.exec(
+        service_name = "builder",
+        recipe = ExecRecipe(
+            command = ["/usr/bin/build.sh"]
+        )
     )
 
-    return cloned
+    # we need to generate a genesis account per node
+    for index in range(0, cluster_size):
+        plan.exec(
+            service_name = "builder",
+            recipe = ExecRecipe(
+                command = ["NODE_ID={0} /usr/bin/configure_init.sh".format(index)]
+            )
+        )
+
+    plan.exec(
+        service_name = "builder",
+        recipe = ExecRecipe(
+            commnad = ["/usr/bin/genesis.sh"]
+        )
+    )
+
+    built = plan.store_service_files(
+        service_name = "builder",
+        src = "/sei-platform/sei-chain"
+    )
+
+    plan.remove_service("builder")
+
+    return built
