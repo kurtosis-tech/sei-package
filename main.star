@@ -44,12 +44,17 @@ def run(plan , args):
 
 # This builds everything and we throw this away
 def launch_builder(plan, cluster_size):
+    cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
+
     plan.add_service(
         name = "builder",
         config = ServiceConfig(
             image = SEI_IMAGE,
             entrypoint = ["sleep", "999999"]
-        )
+        ),
+        files = {
+            "/tmp": cloner,
+        }
     )
 
     plan.exec(
