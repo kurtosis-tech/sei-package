@@ -17,7 +17,7 @@ def run(plan , args):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
 
-    sied, price_feeder = build(plan, cloner)
+    seid, price_feeder = build(plan, cloner)
 
     for index in range(0, cluster_size+1):
         env_vars_for_node = {}
@@ -38,7 +38,7 @@ def run(plan , args):
             },
             files = {
                 "/tmp/cloner": cloner,
-                "/tmp/seid": sied,
+                "/tmp/seid": seid,
                 "/tmp/feeder": price_feeder,
                 "/tmp/configurer": configurer,
             },
@@ -55,7 +55,7 @@ def run(plan , args):
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
-                command = ["mv", "/tmp/seid/seid", MAIN_DIR + "build/" + "seid"],
+                command = ["mv", "/tmp/seid/seid", MAIN_DIR + "build/"],
             )            
         )
 
