@@ -45,6 +45,8 @@ def run(plan , args):
 # This builds everything and we throw this away
 def launch_builder(plan, cluster_size):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
+    configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
+    genesis = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/genesis.sh")
 
     plan.add_service(
         name = "builder",
@@ -52,7 +54,12 @@ def launch_builder(plan, cluster_size):
             image = SEI_IMAGE,
             entrypoint = ["sleep", "999999"],
             files = {
-                "/tmp": cloner,
+                "/tmp/cloner": cloner,
+                "/tmp/configurer": configurer,
+                "/tmp/genesis": genesis,
+            },
+            env_vars = {
+                "CLUSTER_SIZE": str(cluster_size)
             }
         ),
     )
@@ -60,7 +67,7 @@ def launch_builder(plan, cluster_size):
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["/tmp/cloner.sh"]
+            command = ["/tmp/cloner/cloner.sh"]
         )
     )
 
@@ -76,14 +83,14 @@ def launch_builder(plan, cluster_size):
         plan.exec(
             service_name = "builder",
             recipe = ExecRecipe(
-                command = ["/bin/sh", "-c", "ID={0} /usr/bin/configure_init.sh".format(index)]
+                command = ["ID={0} /tmp/configurer/configurer.sh".format(index)]
             )
         )
 
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["ID={0} /usr/bin/genesis.sh"]
+            command = ["ID=0 /tmp/genesis/genesis.sh"]
         )
     )
 
