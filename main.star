@@ -40,7 +40,7 @@ def run(plan , args):
                 "/sei-protocol/": built,
                 "/tmp/cloner": cloner,
                 "/tmp/sied": sied,
-                "/tmp/feeder": price_feeder
+                "/tmp/feeder": price_feeder,
                 "/tmp/configurer": configurer,
             },
             cmd = ["/tmp/cloner/cloner.sh"]
@@ -70,8 +70,19 @@ def run(plan , args):
             service_name = node,
             command = ["/tmp/configurer/configurer.sh"]
         )
+        plan.print(output["output"])
 
-        plan.print(output)
+    # store all build/generated/persistent_peers.txt
+    # build/generated/genesis_accounts.txt
+    # on apic
+    # and keys
+    # upload concatenated genesis_accounts & all exported keys to node 0
+    # upload all persistent peers everywhere
+
+    # run step 2 & 3
+    # copy over the genesis.json from node 0 to everywhere to the right place
+
+    # run step 4, 5 & 6 on all nodes in any order
 
 
 # This builds everything and we throw this away
