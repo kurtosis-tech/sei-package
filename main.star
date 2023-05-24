@@ -77,7 +77,7 @@ def run(plan , args):
     # on apic
     # and keys
     # upload concatenated genesis_accounts & all exported keys to node 0
-    # upload all persistent peers everywhere
+    # upload all persistent peers everywhere after concatenating them & upload via exec
 
     # run step 2 & 3
     # copy over the genesis.json from node 0 to everywhere to the right place
