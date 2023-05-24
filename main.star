@@ -116,7 +116,7 @@ def build(plan, cloner):
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["/tmp/builder/build.sh"],
+            command = ["/tmp/builder/builder.sh"],
         )        
     )
 
