@@ -14,7 +14,6 @@ def run(plan , args):
         env_vars_for_node = {}
         env_vars_for_node["ID"] = str(index)
         env_vars_for_node["CLUSTER_SIZE"] = str(cluster_size)
-        env_vars_for_node["SKIP_BUILD"] = "false"
         env_vars_for_node["NUM_ACCOUNTS"] = str(num_accounts)
 
         config = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/config")
