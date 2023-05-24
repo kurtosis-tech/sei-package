@@ -78,7 +78,7 @@ def launch_builder(plan, cluster_size):
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            commnad = ["/usr/bin/genesis.sh"]
+            command = ["/usr/bin/genesis.sh"]
         )
     )
 
