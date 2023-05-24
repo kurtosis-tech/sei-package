@@ -13,6 +13,9 @@ jobs:
     # Add steps to the job
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
+      - setup_remote_docker:
+          version: "20.10.7"  
+
       # Set up Kurtosis
       - run:
           name: "Build docker image"
