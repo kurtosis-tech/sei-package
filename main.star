@@ -58,14 +58,21 @@ def run(plan , args):
         )
 
         nodes = node_names.append(name)
+
+        plan.exec(
+            service_name = node,
+            recipe = ExecRecipe(
+                command = ["go install", "-g", "github.com/CosmWasm/wasmvm"]
+            )            
+        )
     
-    for node in node_names:
         output = plan.exec(
             service_name = node,
             recipe = ExecRecipe(
-                command = ["/tmp/configurer/configurer.sh"]
+                command = ["/usr/bin/configurer.sh"]
             )            
         )
+
         plan.print(output["output"])
 
     # store all build/generated/persistent_peers.txt
