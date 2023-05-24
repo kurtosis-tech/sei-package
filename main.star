@@ -92,7 +92,7 @@ def launch_builder(plan, cluster_size):
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["ID=0 /tmp/genesis/genesis.sh"]
+            command = ["/bin/sh", "-c", "ID=0 /tmp/genesis/genesis.sh"]
         )
     )
 
