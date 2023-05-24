@@ -5,7 +5,7 @@ DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
 
 MAIN_BASE = "/sei-protocol/"
-MAIN_DIR = MAIN_BASE + "/sei-chain/"
+MAIN_DIR = MAIN_BASE + "sei-chain/"
 
 
 def run(plan , args):
@@ -73,12 +73,14 @@ def run(plan , args):
 
         plan.print(output["output"])
 
-        plan.exec(
+        output = plan.exec(
             service_name = name,
             recipe = ExecRecipe(
                 command = ["cat build/generated/genesis_accounts.txt"]
             )
         )
+
+        plan.print(output["output"])
 
         nodes = node_names.append(name)        
 
