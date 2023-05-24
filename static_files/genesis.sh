@@ -16,4 +16,4 @@ echo "GOBIN=$GOPATH/bin" >> /root/.bashrc
 echo "export PATH=$GOBIN:$PATH:/usr/local/go/bin:$BUILD_PATH" >> /root/.bashrc
 /bin/bash -c "source /root/.bashrc"
 
-/usr/bin/genesis.sh
+ID=${ID} /usr/bin/genesis.sh
