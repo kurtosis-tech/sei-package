@@ -55,7 +55,7 @@ def launch_builder(plan, cluster_size):
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["git", "clone", "--depth=1", "https://github.com/sei-protocol/sei-chain", "/sei-platform/sei-chain"]
+            command = ["/bin/sh", "-c", "git clone --depth=1 https://github.com/sei-protocol/sei-chain /sei-platform/sei-chain/"]
         )
     )
 
@@ -71,14 +71,14 @@ def launch_builder(plan, cluster_size):
         plan.exec(
             service_name = "builder",
             recipe = ExecRecipe(
-                command = ["NODE_ID={0} /usr/bin/configure_init.sh".format(index)]
+                command = ["/bin/sh", "-c", "ID={0} /usr/bin/configure_init.sh".format(index)]
             )
         )
 
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["/usr/bin/genesis.sh"]
+            command = ["ID={0} /usr/bin/genesis.sh"]
         )
     )
 
