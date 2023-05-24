@@ -62,7 +62,7 @@ def run(plan , args):
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
-                command = ["mv", "/tmp/feeder/price-feeder", MAIN_DIR + "build/" + "price-feeder"],
+                command = ["mv", "/tmp/feeder/price-feeder", MAIN_DIR + "build/"],
             )
         )
 
