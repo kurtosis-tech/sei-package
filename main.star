@@ -67,7 +67,7 @@ def run(plan , args):
         output = plan.exec(
             service_name = name,
             recipe = ExecRecipe(
-                command = ["/usr/bin/configurer.sh"]
+                command = ["/tmp/configurer/configurer.sh"]
             )            
         )
 
