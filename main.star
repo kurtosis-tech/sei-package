@@ -10,13 +10,15 @@ def run(plan , args):
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
 
+    cloned = clone_container(plan)
+
     for index in range(0, cluster_size):
         env_vars_for_node = {}
         env_vars_for_node["ID"] = str(index)
         env_vars_for_node["CLUSTER_SIZE"] = str(cluster_size)
         env_vars_for_node["NUM_ACCOUNTS"] = str(num_accounts)
 
-        config = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/config")
+        entrypoint = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/entrypoint.sh")
 
         config = ServiceConfig(
             image = SEI_IMAGE,
@@ -29,7 +31,7 @@ def run(plan , args):
                 "abci-app": PortSpec(number = 26658, wait = None)
             },
             files = {
-                "/sei-protocol/sei-chain/docker/localnode/config": config,
+                "/sei-protocol/": cloned,
             }
         )
 
@@ -38,3 +40,26 @@ def run(plan , args):
             config = config,
         )
 
+
+def clone_container(plan):
+    plan.add_service(
+        name = "cloner",
+        config = ServiceConfig(
+            image = "alpine/git",
+            entrypoint = ["sleep", "999999"]
+        )
+    )
+
+    plan.exec(
+        service_name = "cloner",
+        recipe = ExecRecipe(
+            command = ["git", "clone", "https://github.com/sei-protocol/sei-chain", "/tmp/sei-chain"]
+        )
+    )
+
+    cloned = plan.store_service_files(
+        service_name = "cloner",
+        src = "/tmp/sei-chain"
+    )
+
+    return cloned
