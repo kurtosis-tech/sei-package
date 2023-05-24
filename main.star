@@ -42,10 +42,18 @@ def run(plan , args):
                 "/tmp/feeder": price_feeder,
                 "/tmp/configurer": configurer,
             },
-            cmd = ["/tmp/cloner/cloner.sh"]
+            entrypoint = ["sleep", "9999999"]
         )
 
-        name = SEI_NODE_PREFIX + str(index)        
+        name = SEI_NODE_PREFIX + str(index)
+
+        plan.exec(
+            service_name = name,
+            recipe = ExecRecipe(
+                command = ["/tmp/cloner/cloner.sh"],
+            )        
+        )
+
 
         plan.add_service(
             name = name,
