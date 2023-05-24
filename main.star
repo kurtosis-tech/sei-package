@@ -4,7 +4,8 @@ SEI_NODE_PREFIX = "node"
 DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
 
-MAIN_DIR = "/sei-protocol/sei-chain/"
+MAIN_BASE = "/sei-protocol/"
+MAIN_DIR = MAIN_BASE + "/sei-chain/"
 
 
 def run(plan , args):
@@ -36,7 +37,7 @@ def run(plan , args):
                 "abci-app": PortSpec(number = 26658, wait = None)
             },
             files = {
-                MAIN_DIR: built,
+                MAIN_BASE: built,
                 "/tmp/configurer": configurer
             },
             entrypoint = ["sleep", "9999999"]
@@ -127,7 +128,7 @@ def build(plan):
 
     built = plan.store_service_files(
         service_name = "builder",
-        src = MAIN_DIR
+        src = "/"
     )
 
     return built
