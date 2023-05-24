@@ -37,7 +37,6 @@ def run(plan , args):
                 "abci-app": PortSpec(number = 26658, wait = None)
             },
             files = {
-                "/sei-protocol/": built,
                 "/tmp/cloner": cloner,
                 "/tmp/sied": sied,
                 "/tmp/feeder": price_feeder,
@@ -55,12 +54,16 @@ def run(plan , args):
 
         plan.exec(
             service_name = name,
-            command = ["mv", "/tmp/sied/sied", MAIN_DIR + "/build/" + "seid"],
+            recipe = ExecRecipe(
+                command = ["mv", "/tmp/sied/sied", MAIN_DIR + "/build/" + "seid"],
+            )            
         )
 
         plan.exec(
             service_name = name,
-            command = ["mv", "/tmp/feeder/price-feeder", MAIN_DIR + "/build/" + "price-feeder"],
+            recipe = ExecRecipe(
+                command = ["mv", "/tmp/feeder/price-feeder", MAIN_DIR + "/build/" + "price-feeder"],
+            )
         )
 
         nodes = node_names.append(name)
@@ -68,7 +71,9 @@ def run(plan , args):
     for node in node_names:
         output = plan.exec(
             service_name = node,
-            command = ["/tmp/configurer/configurer.sh"]
+            recipe = ExecRecipe(
+                command = ["/tmp/configurer/configurer.sh"]
+            )            
         )
         plan.print(output["output"])
 
@@ -103,12 +108,16 @@ def build(plan, cloner):
 
     plan.exec(
         service_name = "builder",
-        command = ["/tmp/cloner/cloner.sh"]
+        recipe = ExecRecipe(
+            command = ["/tmp/cloner/cloner.sh"],
+        )        
     )
 
     plan.exec(
         service_name = "builder",
-        command = ["/tmp/builder/build.sh"]
+        recipe = ExecRecipe(
+            command = ["/tmp/builder/build.sh"],
+        )        
     )
 
     sied = plan.store_service_files(
