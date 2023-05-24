@@ -14,6 +14,7 @@ def run(plan , args):
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
 
     node_names = []
+    genesis_accounts = []
 
     configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
 
@@ -80,9 +81,9 @@ def run(plan , args):
             )
         )
 
-        plan.print(output["output"])
+        genesis_accounts.append(output)
 
-        nodes = node_names.append(name)        
+        node_names.append(name)
 
     # store all build/generated/persistent_peers.txt
     # build/generated/genesis_accounts.txt
