@@ -5,7 +5,7 @@ DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
 
 
-def plan(run , args):
+def run(plan , args):
 
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
@@ -18,7 +18,7 @@ def plan(run , args):
         env_vars_for_node["NUM_ACCOUNTS"] = str(num_accounts)
         config = ServiceConfig(
             image = SEI_IMAGE,
-            env_vars = env_vars_for_node
+            env_vars = env_vars_for_node,
             ports = {
                 "prometheus": PortSpec(number = 9090),
                 "grpc-web": PortSpec(number = 9091),
@@ -29,7 +29,7 @@ def plan(run , args):
         )
 
         plan.add_service(
-            name = node + str(index),
+            name = SEI_NODE_PREFIX + str(index),
             config = config,
         )
 
