@@ -58,7 +58,7 @@ def launch_builder(plan, cluster_size):
                 "/tmp/cloner": cloner,
                 "/tmp/configurer": configurer,
                 "/tmp/genesis": genesis,
-                "/tmp/builder": genesis,
+                "/tmp/builder": builder,
             },
             env_vars = {
                 "CLUSTER_SIZE": str(cluster_size)
