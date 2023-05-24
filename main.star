@@ -141,7 +141,7 @@ def build(plan, cloner):
 
     price_feeder = plan.store_service_files(
         service_name = "builder",
-        src = MAIN_DIR + "/build/price_feeder"
+        src = MAIN_DIR + "/build/price-feeder"
     )
 
 
