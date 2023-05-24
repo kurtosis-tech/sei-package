@@ -50,17 +50,17 @@ def launch_builder(plan, cluster_size):
         name = "builder",
         config = ServiceConfig(
             image = SEI_IMAGE,
-            entrypoint = ["sleep", "999999"]
+            entrypoint = ["sleep", "999999"],
+            files = {
+                "/tmp": cloner,
+            }
         ),
-        files = {
-            "/tmp": cloner,
-        }
     )
 
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "git clone --depth=1 https://github.com/sei-protocol/sei-chain /sei-platform/sei-chain/"]
+            command = ["/tmp/cloner.sh"]
         )
     )
 
