@@ -38,7 +38,7 @@ def run(plan , args):
             },
             files = {
                 "/tmp/cloner": cloner,
-                "/tmp/sied": sied,
+                "/tmp/seid": sied,
                 "/tmp/feeder": price_feeder,
                 "/tmp/configurer": configurer,
             },
@@ -55,7 +55,7 @@ def run(plan , args):
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
-                command = ["mv", "/tmp/sied/sied", MAIN_DIR + "build/" + "seid"],
+                command = ["mv", "/tmp/seid/seid", MAIN_DIR + "build/" + "seid"],
             )            
         )
 
