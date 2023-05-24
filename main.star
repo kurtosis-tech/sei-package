@@ -95,12 +95,9 @@ def build(plan, cloner):
             image = SEI_IMAGE,
             entrypoint = ["sleep", "999999"],
             files = {
-                "/tmp/cloner": cloenr
+                "/tmp/cloner": cloner,
                 "/tmp/builder": builder,
             },
-            env_vars = {
-                "CLUSTER_SIZE": str(cluster_size)
-            }
         ),
     )
 
