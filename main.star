@@ -47,6 +47,7 @@ def launch_builder(plan, cluster_size):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
     genesis = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/genesis.sh")
+    builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
 
     plan.add_service(
         name = "builder",
@@ -57,6 +58,7 @@ def launch_builder(plan, cluster_size):
                 "/tmp/cloner": cloner,
                 "/tmp/configurer": configurer,
                 "/tmp/genesis": genesis,
+                "/tmp/builder.sh": genesis,
             },
             env_vars = {
                 "CLUSTER_SIZE": str(cluster_size)
@@ -74,7 +76,7 @@ def launch_builder(plan, cluster_size):
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["/usr/bin/build.sh"]
+            command = ["/tmp/builder.sh"]
         )
     )
 
