@@ -10,7 +10,7 @@ def run(plan , args):
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
 
-    built = clone_container(plan)
+    built = launch_builder(plan, cluster_size)
 
     for index in range(0, cluster_size+1):
         env_vars_for_node = {}
