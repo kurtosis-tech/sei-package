@@ -3,6 +3,8 @@
 NODE_ID=${ID:-0}
 CLUSTER_SIZE=${CLUSTER_SIZE:-1}
 
+export ID=${ID:-0}
+export CLUSTER_SIZE=${CLUSTER_SIZE:-4}
 
 # Clean up and env set up
 export GOPATH=$HOME/go
