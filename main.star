@@ -4,13 +4,17 @@ SEI_NODE_PREFIX = "node"
 DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
 
+MAIN_DIR = "/sei-protocol/sei-chain/"
+
 
 def run(plan , args):
 
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
 
-    built = launch_builder(plan, cluster_size)
+    node_names = []
+
+    sied, price_feeder = build(plan)
 
     for index in range(0, cluster_size+1):
         env_vars_for_node = {}
@@ -18,7 +22,7 @@ def run(plan , args):
         env_vars_for_node["CLUSTER_SIZE"] = str(cluster_size)
         env_vars_for_node["NUM_ACCOUNTS"] = str(num_accounts)
 
-        entrypoint = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/entrypoint.sh")
+        cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
 
         config = ServiceConfig(
             image = SEI_IMAGE,
@@ -32,22 +36,37 @@ def run(plan , args):
             },
             files = {
                 "/sei-protocol/": built,
-                "/tmp/": entrypoint,
+                "/tmp/": cloner,
+                "/tmp/sied": sied,
+                "/tmp/feeder": price_feeder
             },
-            cmd = ["/tmp/entrypoint.sh"]
+            cmd = ["/tmp/cloner.sh"]
         )
 
+        name = SEI_NODE_PREFIX + str(index)        
+
         plan.add_service(
-            name = SEI_NODE_PREFIX + str(index),
+            name = name,
             config = config,
         )
 
+        plan.exec(
+            service_name = name,
+            command = ["mv", "/tmp/sied/sied", MAIN_DIR + "/build/" + "seid"],
+        )
+
+        plan.exec(
+            service_name = name,
+            command = ["mv", "/tmp/feeder/price-feeder", MAIN_DIR + "/build/" + "price-feeder"],
+        )
+
+        nodes = node_names.append(name)
+    
+
 
 # This builds everything and we throw this away
-def launch_builder(plan, cluster_size):
+def build(plan):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
-    configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
-    genesis = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/genesis.sh")
     builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
 
     plan.add_service(
@@ -56,9 +75,7 @@ def launch_builder(plan, cluster_size):
             image = SEI_IMAGE,
             entrypoint = ["sleep", "999999"],
             files = {
-                "/tmp/cloner": cloner,
-                "/tmp/configurer": configurer,
-                "/tmp/genesis": genesis,
+                "/tmp/cloner": cloenr
                 "/tmp/builder": builder,
             },
             env_vars = {
@@ -69,39 +86,23 @@ def launch_builder(plan, cluster_size):
 
     plan.exec(
         service_name = "builder",
-        recipe = ExecRecipe(
-            command = ["/tmp/cloner/cloner.sh"]
-        )
+        command = ["/tmp/cloner/cloner.sh"]
     )
 
     plan.exec(
         service_name = "builder",
-        recipe = ExecRecipe(
-            command = ["/tmp/builder/builder.sh"]
-        )
+        command = ["/tmp/builder/build.sh"]
     )
 
-    # we need to generate a genesis account per node
-    for index in range(0, cluster_size):
-        plan.exec(
-            service_name = "builder",
-            recipe = ExecRecipe(
-                command = ["/bin/sh", "-c", "ID={0} /tmp/configurer/configurer.sh".format(index)]
-            )
-        )
-
-    plan.exec(
-        service_name = "builder",
-        recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "ID=0 /tmp/genesis/genesis.sh"]
-        )
+    sied = plan.store_service_files(
+        service_name = "node0",
+        src = MAIN_DIR + "/build/seid"
     )
 
-    built = plan.store_service_files(
-        service_name = "builder",
-        src = "/sei-protocol/sei-chain"
+    price_feeder = plan.store_service_files(
+        service_name = "node0",
+        src = MAIN_DIR + "/build/price_feeder"
     )
 
-    plan.remove_service("builder")
 
-    return built
+    return sied, price_feeder
