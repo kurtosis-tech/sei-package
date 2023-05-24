@@ -6,6 +6,7 @@ executors:
   ubuntu_vm:
     machine:
       image: ubuntu-2004:2023.04.2
+      docker_layer_caching: true 
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
