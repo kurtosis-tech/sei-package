@@ -10,7 +10,7 @@ def run(plan , args):
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
 
-    cloned = clone_container(plan)
+    # cloned = clone_container(plan)
 
     for index in range(0, cluster_size):
         env_vars_for_node = {}
@@ -31,8 +31,9 @@ def run(plan , args):
                 "abci-app": PortSpec(number = 26658, wait = None)
             },
             files = {
-                "/sei-protocol/": cloned,
-            }
+                "/tmp/": entrypoint,
+            },
+            cmd = ["/tmp/entrypoint.sh"]
         )
 
         plan.add_service(
