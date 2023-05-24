@@ -30,7 +30,7 @@ def run(plan , args):
             image = SEI_IMAGE,
             env_vars = env_vars_for_node,
             ports = {
-                "prometheus": PortSpec(number = 9090, wait = "6000s"),
+                "prometheus": PortSpec(number = 9090, wait = None),
                 "grpc-web": PortSpec(number = 9091, wait = None),
                 "tendermint-p2p": PortSpec(number = 26656, wait = None),
                 "tendermint-rpc": PortSpec(number = 26657, wait = None),
