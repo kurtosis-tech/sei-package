@@ -63,7 +63,7 @@ def run(plan , args):
                 command = ["go install", "-g", "github.com/CosmWasm/wasmvm"]
             )            
         )
-    
+
         output = plan.exec(
             service_name = name,
             recipe = ExecRecipe(
@@ -72,6 +72,13 @@ def run(plan , args):
         )
 
         plan.print(output["output"])
+
+        plan.exec(
+            service_name = name,
+            recipe = ExecRecipe(
+                output = ["cat build/generated/genesis_accounts.txt"]
+            )
+        )
 
         nodes = node_names.append(name)        
 
@@ -135,7 +142,7 @@ def build(plan):
 
     built = plan.store_service_files(
         service_name = "builder",
-        src = "/"
+        src = MAIN_BASE
     )
 
     return built
