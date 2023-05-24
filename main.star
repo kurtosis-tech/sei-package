@@ -36,10 +36,8 @@ def run(plan , args):
                 "abci-app": PortSpec(number = 26658, wait = None)
             },
             files = {
-                "/tmp/cloner": cloner,
-                "/tmp/seid": seid,
-                "/tmp/feeder": price_feeder,
-                MAIN_DIR: built
+                MAIN_DIR: built,
+                "/tmp/configurer": configurer
             },
             entrypoint = ["sleep", "9999999"]
         )
@@ -54,35 +52,7 @@ def run(plan , args):
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
-                command = ["/tmp/cloner/cloner.sh"],
-            )
-        )
-
-        plan.exec(
-            service_name = name,
-            recipe = ExecRecipe(
-                command = ["mkdir", MAIN_DIR + "build/"],
-            )
-        )
-
-        plan.exec(
-            service_name = name,
-            recipe = ExecRecipe(
                 command = ["mkdir", MAIN_DIR + "/root/go/bin"],
-            )
-        )
-
-        plan.exec(
-            service_name = name,
-            recipe = ExecRecipe(
-                command = ["mv", "/tmp/seid/seid", MAIN_DIR + "build/"],
-            )
-        )
-
-        plan.exec(
-            service_name = name,
-            recipe = ExecRecipe(
-                command = ["mv", "/tmp/feeder/price-feeder", MAIN_DIR + "build/"],
             )
         )
 
