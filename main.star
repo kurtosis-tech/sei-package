@@ -121,12 +121,12 @@ def build(plan, cloner):
     )
 
     sied = plan.store_service_files(
-        service_name = "node0",
+        service_name = "builder",
         src = MAIN_DIR + "/build/seid"
     )
 
     price_feeder = plan.store_service_files(
-        service_name = "node0",
+        service_name = "builder",
         src = MAIN_DIR + "/build/price_feeder"
     )
 
