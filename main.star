@@ -15,6 +15,7 @@ def run(plan , args):
 
     node_names = []
     genesis_accounts = []
+    peers = []
 
     configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
 
@@ -73,10 +74,11 @@ def run(plan , args):
         )
 
 
-        account = read_file(name, "build/generated/genesis_accounts.txt")
-        peers = read_file(name, "build/generated/persistent_peers.txt")
+        account = read_file_from_service(plan, name, "build/generated/genesis_accounts.txt")
+        peer = read_file_from_service(plan, name, "build/generated/persistent_peers.txt")
 
         genesis_accounts.append(output)
+        peers.append(peer)
         node_names.append(name)
 
     # store all build/generated/persistent_peers.txt
@@ -92,7 +94,7 @@ def run(plan , args):
     # run step 4, 5 & 6 on all nodes in any order
 
 
-def read_file(service_name, filename):
+def read_file_from_service(plan, service_name, filename):
     output = plan.exec(
         service_name = name,
         recipe = ExecRecipe(
