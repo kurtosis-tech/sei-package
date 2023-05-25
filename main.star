@@ -106,21 +106,26 @@ def run(plan , args):
 
 
     # copy over genesis accounts to node0
+    plan.print("Copying over genesis accounts to {0}".format(node_names[ZEROTH_NODE]))
     write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
     read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], GENESIS_ACCOUNTS_PATH)
 
     # copy over persistent peers to node 0
+    plan.print("Concatenating {0} on all nodes".format(PERSISTENT_PEERS_PATH))
     combine_file_over_nodes(plan, node_names, peers, PERSISTENT_PEERS_PATH)
 
     # copy over exported keys to node 0
+    plan.print("Copying over all exported_keys to {0}".format(node_names[ZEROTH_NODE]))
     for source_node in node_names[1:]:
         copy_only_file_in_dir(plan, source_node, EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE], EXPORTED_KEYS_PATH)
 
     # copy over gentx to node 0
+    plan.print("Copying over all gentx to {0}".format(node_names[ZEROTH_NODE]))
     for source_node in node_names[1:]:
         copy_only_file_in_dir(plan, source_node, GENTX_PATH, node_names[ZEROTH_NODE], GENTX_PATH)
 
     # verify exported keys
+    plan.print("Verifying exported keys on {0}".format(node_names[ZEROTH_NODE]))
     plan.exec(
         service_name = node_names[ZEROTH_NODE],
         recipe = ExecRecipe(
@@ -129,6 +134,7 @@ def run(plan , args):
     )
 
     # run step 2 & 3 on zero'th node
+    plan.print("Running Genesis on {0}".format(node_names[ZEROTH_NODE]))
     plan.exec(
         service_name = node_names[ZEROTH_NODE],
         recipe = ExecRecipe(
@@ -140,6 +146,7 @@ def run(plan , args):
 
     # run step 4 and 5 everywhere
     for name in node_names:
+        plan.print("Running SIED node on {0}".format(name))
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
@@ -147,11 +154,12 @@ def run(plan , args):
             )
         )
 
-    # we wait for the tendermint rpc port to come alive before running the price-feeder
+    plan.print("Waiting for tendermint rpc port to be alive on every node before running price feeder")
     wait_on_tendermint_rpc(plan, node_names)
 
     # run step 6 after 4 & 5 are done at both places
     for name in node_names:
+        plan.print("Running price feeder on node {0}".format(name))
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
