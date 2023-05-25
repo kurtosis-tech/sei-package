@@ -3,6 +3,7 @@
 NODE_ID=${ID:-0}
 CLUSTER_SIZE=${CLUSTER_SIZE:-1}
 
+# TODO remove this from others too
 export ID=${ID:-0}
 export CLUSTER_SIZE=${CLUSTER_SIZE:-4}
 
