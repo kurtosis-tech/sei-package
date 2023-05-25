@@ -66,6 +66,11 @@ def run(plan , args):
             )            
         )
 
+
+        node_names.append(name)
+
+    for name in node_names:
+
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
@@ -79,7 +84,7 @@ def run(plan , args):
 
         genesis_accounts.append(account)
         peers.append(peer)
-        node_names.append(name)
+        
 
     write_together_node0(plan, genesis_accounts, "build/generated/genesis_accounts.txt")
     plan.print(read_file_from_service(plan, node_names[0], "build/generated/genesis_accounts.txt"))
