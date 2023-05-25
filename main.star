@@ -11,6 +11,7 @@ PERSISTENT_PEERS_PATH = "build/generated/persistent_peers.txt"
 GENESIS_ACCOUNTS_PATH = "build/generated/genesis_accounts.txt"
 EXPORTED_KEYS_PATH = "build/generated/exported_keys/"
 GENESIS_JSON_PATH = "build/generated/genesis.json"
+GENTX_PATH = "build/generated/gentx/"
 
 ZEROTH_NODE = 0
 
@@ -104,11 +105,15 @@ def run(plan , args):
     read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], GENESIS_ACCOUNTS_PATH)
 
     # copy over persistent peers to node 0
-    combine_file_over_nodes(plan, node_names, peers, PERSISTENT_PEERS_PATH)    
+    combine_file_over_nodes(plan, node_names, peers, PERSISTENT_PEERS_PATH)
 
     # copy over exported keys to node 0
     for source_node in node_names[1:]:
         copy_only_file_in_dir(plan, source_node, EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE], EXPORTED_KEYS_PATH)
+
+    # copy over gentx to node 0
+    for source_node in node_names[1:]:
+        copy_only_file_in_dir(plan, source_node, GENTX_PATH, node_names[ZEROTH_NODE], GENTX_PATH)
     
     # verify exported keys
     plan.exec(
