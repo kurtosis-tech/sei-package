@@ -69,13 +69,14 @@ def run(plan , args):
 
         node_names.append(name)
 
+
     for name in node_names:
 
         plan.exec(
             service_name = name,
             recipe = ExecRecipe(
                 command = ["/tmp/configurer/configurer.sh"]
-            )            
+            )
         )
 
 
@@ -84,7 +85,7 @@ def run(plan , args):
 
         genesis_accounts.append(account)
         peers.append(peer)
-        
+
 
     write_together_node0(plan, genesis_accounts, "build/generated/genesis_accounts.txt")
     plan.print(read_file_from_service(plan, node_names[0], "build/generated/genesis_accounts.txt"))
@@ -106,17 +107,17 @@ def read_file_from_service(plan, service_name, filename):
     output = plan.exec(
         service_name = service_name,
         recipe = ExecRecipe(
-            command = ["cat", filename]
+            command = ["/bin/sh", "-c", "cat {} | tr -d '\n'".format(filename)]
         )
     )
     return output["output"]
 
 
 def write_together_node0(plan, lines, filename):
-    for line in lines[0:]:
+    for line in lines[1:]:
         plan.exec(
             service_name = "node0",
-            recipe = ExecRecipe(command = ["echo", "\"{}\"".format(line), ">>", filename])
+            recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" >> {1}'.format(line, filename)])
         )
 
 
