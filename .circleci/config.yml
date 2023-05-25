@@ -32,4 +32,4 @@ jobs:
 workflows:
   run-basic-test:
     jobs:
-      - say-hello
+      - run-basic-test
