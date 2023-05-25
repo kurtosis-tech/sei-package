@@ -157,6 +157,26 @@ def run(plan , args):
         )
 
 
+    print_some_logs(node_names)
+
+
+# print some logs on each node
+def print_some_logs(plan, node_names):
+    for index, node in enumerate(node_names):
+        plan.exec(
+            service_name = node,
+            recipe = ExecRecipe(
+                command = ["/bin/sh", "-c", "tail -n 10 build/generated/logs/seid-{0}.log".format(index)]
+            )
+        )
+        plan.exec(
+            service_name = node,
+            recipe = ExecRecipe(
+                command = ["/bin/sh", "-c", "tail -n 10 build/generated/logs/price-feeder-{0}.log".format(index)]
+            )
+        )
+
+
 # copies genesis.json from node0 to all other nodes
 def copy_genesis_json_to_other_nodes(plan, node_names):
     plan.exec(
