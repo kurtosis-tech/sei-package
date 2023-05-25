@@ -9,7 +9,9 @@ MAIN_DIR = MAIN_BASE + "sei-chain/"
 
 PERSISTENT_PEERS_PATH = "build/generated/persistent_peers.txt"
 GENESIS_ACCOUNTS_PATH = "build/generated/genesis_accounts.txt"
+EXPORTED_KEYS_PATH = "build/generated/exported_keys/"
 
+ZEROTH_NODE = 0
 
 def run(plan , args):
 
@@ -91,23 +93,40 @@ def run(plan , args):
 
 
     write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
-    read_file_from_service_with_nl(plan, node_names[0], GENESIS_ACCOUNTS_PATH)
+    read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], GENESIS_ACCOUNTS_PATH)
 
     write_together_node0(plan, peers, PERSISTENT_PEERS_PATH)
-    read_file_from_service_with_nl(plan, node_names[0], PERSISTENT_PEERS_PATH)
+    read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], PERSISTENT_PEERS_PATH)
 
+    copy_file_in_dir(plan, source_service_name, dir_name, target_service_name, target_dir_name)
 
-    # store all build/generated/persistent_peers.txt
-    # build/generated/genesis_accounts.txt
-    # on apic
-    # and keys
-    # upload concatenated genesis_accounts & all exported keys to node 0
-    # upload all persistent peers everywhere after concatenating them & upload via exec
+    for node in node_names[1:]:
+        copy_file_in_dir(plan, EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE], EXPORTED_KEYS_PATH)
+
+    plan.exec(
+        node_names[ZEROTH_NODE],
+        command = ["ls", EXPORTED_KEYS_PATH]
+    )
 
     # run step 2 & 3
     # copy over the genesis.json from node 0 to everywhere to the right place
 
     # run step 4, 5 & 6 on all nodes in any order
+
+
+# this assumes there is only one file in that dir
+def copy_file_in_dir(plan, source_service_name, dir_name, target_service_name, target_dir_name)):
+    filename_response = plan.exec(
+        service_name = service_name,
+        recipe = ExecRecipe(
+            command = ["ls", dir_name]
+        )
+    )
+
+    filename = filename_response["output"]
+    filedata = read_file_from_service(source_service_name, dir_name + filename_response)
+
+    write_together_node0
 
 
 def read_file_from_service(plan, service_name, filename):
