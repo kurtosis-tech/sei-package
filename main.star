@@ -264,7 +264,7 @@ def build(plan, image, builds_image_live):
 
     if not builds_image_live:
         plan.exec(
-            service_name = node,
+            service_name = "builder",
             recipe = ExecRecipe(
                 command = ["git", "checkout", "3.0.1"]
             )
