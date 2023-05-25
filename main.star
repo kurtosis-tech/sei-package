@@ -81,6 +81,8 @@ def run(plan , args):
         peers.append(peer)
         node_names.append(name)
 
+    write_together_node1(plan, node_names[0], genesis_accounts, "build/generated/genesis_accounts.txt")
+
     # store all build/generated/persistent_peers.txt
     # build/generated/genesis_accounts.txt
     # on apic
@@ -102,6 +104,14 @@ def read_file_from_service(plan, service_name, filename):
         )
     )
     return output["output"]
+
+
+def write_together_node0(plan, lines, filename)
+    for line in lines[0:]:
+        plan.exec(
+            service_name = "node0",
+            command = ["echo", "\"{}\"".format(line), ">>", filename]
+        )
 
 
 # This builds everything and we throw this away
