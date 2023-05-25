@@ -147,6 +147,7 @@ def run(plan , args):
         )
 
 
+# copies genesis.json from node0 to all other nodes
 def copy_genesis_json_to_other_nodes(plan, node_names):
     plan.exec(
         service_name = node_names[ZEROTH_NODE],
@@ -164,6 +165,7 @@ def copy_genesis_json_to_other_nodes(plan, node_names):
         copy_only_file_in_dir(plan, node_names[ZEROTH_NODE], "/tmp/genesis_json/", target_node, "build/generated/")
 
 
+# copies the only file in source dir to the target dir preserving its name
 def copy_only_file_in_dir(plan, source_service_name, dir_name, target_service_name, target_dir_name):
     filename_response = plan.exec(
         service_name = source_service_name,
@@ -183,6 +185,7 @@ def copy_only_file_in_dir(plan, source_service_name, dir_name, target_service_na
     read_file_from_service_with_nl(plan, target_service_name, "{}{}".format(target_dir_name, filename))
 
 
+# reads the given file in service without the new line
 def read_file_from_service(plan, service_name, filename):
     output = plan.exec(
         service_name = service_name,
@@ -193,6 +196,7 @@ def read_file_from_service(plan, service_name, filename):
     return output["output"]
 
 
+# reads the given file from service with new lines
 def read_file_from_service_with_nl(plan, service_name, filename):
     output = plan.exec(
         service_name = service_name,
@@ -203,7 +207,7 @@ def read_file_from_service_with_nl(plan, service_name, filename):
     return output["output"]
 
 
-
+# writes a given file on multiple nodes into one file on node0
 def write_together_node0(plan, lines, filename):
     for line in lines[1:]:
         plan.exec(
@@ -212,6 +216,7 @@ def write_together_node0(plan, lines, filename):
         )
 
 
+# combines a file distributed accross nodes to a new file on node0
 def combine_file_over_nodes(plan, node_names, lines, filename):
     for index, target_node_name in enumerate(node_names):
         for line in lines[0:index] + lines[index+1:]:
@@ -222,7 +227,8 @@ def combine_file_over_nodes(plan, node_names, lines, filename):
         # we verify things were properly written
         read_file_from_service_with_nl(plan, target_node_name, filename)
 
-# This builds everything and we throw this away
+
+# This builds the binary and we throw this away
 def build(plan):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
@@ -271,5 +277,7 @@ def build(plan):
         service_name = "builder",
         src = MAIN_DIR
     )
+
+    plan.remove_service("builder")
 
     return built
