@@ -189,7 +189,7 @@ def copy_only_file_in_dir(plan, source_service_name, dir_name, target_service_na
 
     plan.exec(
         service_name = target_service_name,
-        recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo -n "{0}" > {1}{2}'.format(filedata, target_dir_name, filename)])
+        recipe = ExecRecipe(command = ["/bin/sh", "-c", "echo -n '{0}' > {1}{2}".format(filedata, target_dir_name, filename)])
     )
 
     read_file_from_service_with_nl(plan, target_service_name, "{}{}".format(target_dir_name, filename))
