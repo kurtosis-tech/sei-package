@@ -91,10 +91,10 @@ def run(plan , args):
 
 
     write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
-    read_file_from_service_nl(plan, node_names[0], GENESIS_ACCOUNTS_PATH)
+    read_file_from_service(plan, node_names[0], GENESIS_ACCOUNTS_PATH)
 
     write_together_node0(plan, genesis_accounts, PERSISTENT_PEERS_PATH)
-    read_file_from_service_nl(plan, node_names[0], PERSISTENT_PEERS_PATH)
+    read_file_from_service(plan, node_names[0], PERSISTENT_PEERS_PATH)
 
 
     # store all build/generated/persistent_peers.txt
@@ -114,16 +114,6 @@ def read_file_from_service(plan, service_name, filename):
     output = plan.exec(
         service_name = service_name,
         recipe = ExecRecipe(
-            command = ["/bin/sh", "-c", "cat {} | tr -d '\n'".format(filename)]
-        )
-    )
-    return output["output"]
-
-
-def read_file_from_service_nl(plan, service_name, filename):
-    output = plan.exec(
-        service_name = service_name,
-        recipe = ExecRecipe(
             command = ["/bin/sh", "-c", "cat {}".format(filename)]
         )
     )
@@ -134,7 +124,7 @@ def write_together_node0(plan, lines, filename):
     for line in lines[1:]:
         plan.exec(
             service_name = "node0",
-            recipe = ExecRecipe(command = ["/bin/sh", "-c", """$'echo "\n{0}" >> {1}'""".format(line, filename)])
+            recipe = ExecRecipe(command = ["/bin/sh", "-c", "echo $'\n{0}' >> {1}".format(line, filename)])
         )
 
 
