@@ -108,7 +108,7 @@ def run(plan , args):
 
     # copy over exported keys to node 0
     for source_node in node_names[1:]:
-        copy_only_file_in_dir(plan, source_node, EXPORTED_KEYS_PATH, , EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE])
+        copy_only_file_in_dir(plan, source_node, EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE], EXPORTED_KEYS_PATH)
     
     # verify exported keys
     plan.exec(
