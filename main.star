@@ -124,7 +124,7 @@ def write_together_node0(plan, lines, filename):
     for line in lines[1:]:
         plan.exec(
             service_name = "node0",
-            recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "" >> {1}'.format(line, filename)])
+            recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "" >> {1}'.format(filename)])
         )
         plan.exec(
             service_name = "node0",
