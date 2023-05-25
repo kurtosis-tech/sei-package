@@ -171,7 +171,9 @@ def run(plan , args):
     plan.print("We wait for 20 seconds to make sure that the price feeder is healthy")
     plan.exec(
         service_name = node_names[ZEROTH_NODE],
-        command = ["sleep", "20"]
+        recipe = ExecRecipe(
+            command = ["sleep", "20"]
+        )
     )
 
     print_some_logs(plan, node_names)
