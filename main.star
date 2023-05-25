@@ -7,6 +7,9 @@ DEFAULT_NUM_ACCOUNTS = 10
 MAIN_BASE = "/sei-protocol/"
 MAIN_DIR = MAIN_BASE + "sei-chain/"
 
+PERSISTENT_PEERS_PATH = "build/generated/persistent_peers.txt"
+GENESIS_ACCOUNTS_PATH = "build/generated/genesis_accounts.txt"
+
 
 def run(plan , args):
 
@@ -80,15 +83,19 @@ def run(plan , args):
         )
 
 
-        account = read_file_from_service(plan, name, "build/generated/genesis_accounts.txt")
-        peer = read_file_from_service(plan, name, "build/generated/persistent_peers.txt")
+        account = read_file_from_service(plan, name, GENESIS_ACCOUNTS_PATH)
+        peer = read_file_from_service(plan, name, PERSISTENT_PEERS_PATH)
 
         genesis_accounts.append(account)
         peers.append(peer)
 
 
-    write_together_node0(plan, genesis_accounts, "build/generated/genesis_accounts.txt")
-    plan.print(read_file_from_service(plan, node_names[0], "build/generated/genesis_accounts.txt"))
+    write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
+    plan.print(read_file_from_service(plan, node_names[0], GENESIS_ACCOUNTS_PATH))
+
+    write_together_node0(plan, genesis_accounts, PERSISTENT_PEERS_PATH)
+    plan.print(read_file_from_service(plan, node_names[0], PERSISTENT_PEERS_PATH))
+
 
     # store all build/generated/persistent_peers.txt
     # build/generated/genesis_accounts.txt
@@ -117,7 +124,7 @@ def write_together_node0(plan, lines, filename):
     for line in lines[1:]:
         plan.exec(
             service_name = "node0",
-            recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" >> {1}'.format(line, filename)])
+            recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "\n{0}" >> {1}'.format(line, filename)])
         )
 
 
