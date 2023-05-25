@@ -91,10 +91,10 @@ def run(plan , args):
 
 
     write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
-    read_file_from_service(plan, node_names[0], GENESIS_ACCOUNTS_PATH)
+    read_file_from_service_with_nl(plan, node_names[0], GENESIS_ACCOUNTS_PATH)
 
     write_together_node0(plan, peers, PERSISTENT_PEERS_PATH)
-    read_file_from_service(plan, node_names[0], PERSISTENT_PEERS_PATH)
+    read_file_from_service_with_nl(plan, node_names[0], PERSISTENT_PEERS_PATH)
 
 
     # store all build/generated/persistent_peers.txt
@@ -118,6 +118,17 @@ def read_file_from_service(plan, service_name, filename):
         )
     )
     return output["output"]
+
+
+def read_file_from_service_with_nl(plan, service_name, filename):
+    output = plan.exec(
+        service_name = service_name,
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cat {}".format(filename)]
+        )
+    )
+    return output["output"]
+
 
 
 def write_together_node0(plan, lines, filename):
