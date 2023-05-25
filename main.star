@@ -65,24 +65,18 @@ def run(plan , args):
             )            
         )
 
-        output = plan.exec(
+        plan.exec(
             service_name = name,
             recipe = ExecRecipe(
                 command = ["/tmp/configurer/configurer.sh"]
             )            
         )
 
-        plan.print(output["output"])
 
-        output = plan.exec(
-            service_name = name,
-            recipe = ExecRecipe(
-                command = ["cat", "build/generated/genesis_accounts.txt"]
-            )
-        )
+        account = read_file(name, "build/generated/genesis_accounts.txt")
+        peers = read_file(name, "build/generated/persistent_peers.txt")
 
         genesis_accounts.append(output)
-
         node_names.append(name)
 
     # store all build/generated/persistent_peers.txt
@@ -96,6 +90,16 @@ def run(plan , args):
     # copy over the genesis.json from node 0 to everywhere to the right place
 
     # run step 4, 5 & 6 on all nodes in any order
+
+
+def read_file(service_name, filename):
+    output = plan.exec(
+        service_name = name,
+        recipe = ExecRecipe(
+            command = ["cat", filename]
+        )
+    )
+    return output["output"]
 
 
 # This builds everything and we throw this away
