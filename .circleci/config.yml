@@ -25,7 +25,14 @@ jobs:
           sudo apt install kurtosis-cli
       
       - run: |
-          kurtosis run .
+          kurtosis run . --enclave sei-enclave
+
+
+      - run: |
+          kurtosis service shell sei-enclave --exec "cat build/generated/logs/seid-0.log"
+          kurtosis service shell sei-enclave --exec "cat build/generated/logs/seid-1.log"
+          kurtosis service shell sei-enclave --exec "cat build/generated/logs/seid-2.log"
+          kurtosis service shell sei-enclave --exec "cat build/generated/logs/seid-3.log"
         
 
 # Orchestrate jobs using workflows
