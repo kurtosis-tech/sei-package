@@ -81,7 +81,7 @@ def run(plan , args):
             service_name = name,
             recipe = ExecRecipe(
                 command = ["/bin/sh", "-c", "go install github.com/CosmWasm/wasmvm"]
-            )            
+            )
         )
 
 
@@ -119,7 +119,7 @@ def run(plan , args):
     # copy over gentx to node 0
     for source_node in node_names[1:]:
         copy_only_file_in_dir(plan, source_node, GENTX_PATH, node_names[ZEROTH_NODE], GENTX_PATH)
-    
+
     # verify exported keys
     plan.exec(
         service_name = node_names[ZEROTH_NODE],
@@ -137,7 +137,7 @@ def run(plan , args):
     )
 
     copy_genesis_json_to_other_nodes(plan, node_names)
-    
+
     # run step 4 and 5 everywhere
     for name in node_names:
         plan.exec(
@@ -167,14 +167,14 @@ def run(plan , args):
 def wait_on_tendermint_rpc(plan, node_names):
     request_recipe  = GetHttpRequestRecipe(
         port_id = "tendermint-rpc",
-        endpoint = "/",        
+        endpoint = "/",
     )
     for name in node_names:
         plan.wait(
-            service_name=name, 
-            recipe=request_recipe, 
-            field="code", 
-            assertion="==", 
+            service_name=name,
+            recipe=request_recipe,
+            field="code",
+            assertion="==",
             target_value=200,
         )
 
@@ -201,13 +201,13 @@ def copy_genesis_json_to_other_nodes(plan, node_names):
         service_name = node_names[ZEROTH_NODE],
         recipe = ExecRecipe(
             command = ["mkdir", "-p", "/tmp/genesis_json/"]
-        )        
-    )    
+        )
+    )
     plan.exec(
         service_name = node_names[ZEROTH_NODE],
         recipe = ExecRecipe(
             command = ["cp", GENESIS_JSON_PATH, "/tmp/genesis_json/"]
-        )        
+        )
     )
     for target_node in node_names[1:]:
         copy_only_file_in_dir(plan, node_names[ZEROTH_NODE], "/tmp/genesis_json/", target_node, "build/generated/")
@@ -297,7 +297,7 @@ def build(plan, image, builds_image_live):
         service_name = "builder",
         recipe = ExecRecipe(
             command = ["/tmp/cloner/cloner.sh"],
-        )        
+        )
     )
 
     if not builds_image_live:
@@ -312,21 +312,21 @@ def build(plan, image, builds_image_live):
         service_name = "builder",
         recipe = ExecRecipe(
             command = ["date"],
-        )        
+        )
     )
 
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
             command = ["/tmp/builder/builder.sh"],
-        )        
+        )
     )
 
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
             command = ["date"],
-        )        
+        )
     )
 
     built = plan.store_service_files(
