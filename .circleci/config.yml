@@ -6,7 +6,6 @@ executors:
   ubuntu_vm:
     machine:
       image: ubuntu-2004:2023.04.2
-      docker_layer_caching: true 
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
@@ -18,16 +17,6 @@ jobs:
     # Add steps to the job
     # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
-      # Set up Kurtosis
-      - run:
-          name: "Build docker image"
-          command: |
-            mkdir /tmp/docker-builder
-            cd /tmp/docker-builder
-            git clone https://github.com/sei-protocol/sei-chain
-            cd sei-chain
-            make build-docker-node
-
       - checkout
 
       - run: |
@@ -36,7 +25,7 @@ jobs:
           sudo apt install kurtosis-cli
       
       - run: |
-          kurtosis run . '{"builds_image_live": true}'
+          kurtosis run .
         
 
 # Orchestrate jobs using workflows
