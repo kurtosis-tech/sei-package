@@ -147,6 +147,9 @@ def run(plan , args):
             )
         )
 
+    # we wait for the tendermint rpc port to come alive before running the price-feeder
+    wait_on_tendermint_rpc(plan, node_names)
+
     # run step 6 after 4 & 5 are done at both places
     for name in node_names:
         plan.exec(
@@ -157,8 +160,23 @@ def run(plan , args):
         )
 
 
-    print_some_logs(node_names)
+    print_some_logs(plan, node_names)
 
+
+# print some logs on each node
+def wait_on_tendermint_rpc(plan, node_names):
+    request_recipe  = GetHttpRequestRecipe(
+        port_id = "tendermint-rpc",
+        endpoint = "/",        
+    )
+    for name in node_names:
+        plan.wait(
+            service_name=name, 
+            recipe=request_recipe, 
+            field="code", 
+            assertion="==", 
+            target_value=200,
+        )
 
 # print some logs on each node
 def print_some_logs(plan, node_names):

@@ -12,3 +12,5 @@ arguments like -
 ```bash
 kurtosis run github.com/kurtosis-tech/sei-package '{"cluster_size": 4, "num_accounts": 10}'
 ```
+
+This starts the SEI node and the price feeder on each node
