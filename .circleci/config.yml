@@ -36,7 +36,7 @@ jobs:
           sudo apt install kurtosis-cli
     
       
-      - run: kurtosis run .
+      - run: kurtosis run . '{"builds_image_live": true}'
         
 
 # Orchestrate jobs using workflows

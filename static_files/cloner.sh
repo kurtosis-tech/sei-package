@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+# checkout write tag
 git clone https://github.com/sei-protocol/sei-chain --depth=1 /sei-protocol/sei-chain &
 pid=$!
 

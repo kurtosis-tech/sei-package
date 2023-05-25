@@ -1,4 +1,5 @@
 SEI_IMAGE = "sei-chain/localnode"
+SEI_PUBLISHED_IMAGE = "h4ck3rk3y/localnode:3.0.1"
 SEI_NODE_PREFIX = "node"
 
 DEFAULT_CLUSTER_SIZE = 4
@@ -16,6 +17,10 @@ GENTX_PATH = "build/generated/gentx/"
 ZEROTH_NODE = 0
 
 def run(plan , args):
+    image = SEI_PUBLISHED_IMAGE
+    builds_image_live = arge.get("builds_image_live", False)
+    if builds_image_live:
+        image = SEI_IMAGE
 
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
@@ -29,7 +34,7 @@ def run(plan , args):
     step45 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_4_and_5.sh")
     step6 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_6.sh")
 
-    built = build(plan)
+    built = build(plan, image, builds_image_live)
 
     for index in range(0, cluster_size):
         env_vars_for_node = {}
@@ -39,7 +44,7 @@ def run(plan , args):
 
 
         config = ServiceConfig(
-            image = SEI_IMAGE,
+            image = image,
             env_vars = env_vars_for_node,
             ports = {
                 "prometheus": PortSpec(number = 9090, wait = None),
@@ -184,7 +189,7 @@ def copy_only_file_in_dir(plan, source_service_name, dir_name, target_service_na
 
     plan.exec(
         service_name = target_service_name,
-        recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" > {1}{2}'.format(filedata, target_dir_name, filename)])
+        recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo -n "{0}" > {1}{2}'.format(filedata, target_dir_name, filename)])
     )
 
     read_file_from_service_with_nl(plan, target_service_name, "{}{}".format(target_dir_name, filename))
@@ -234,14 +239,14 @@ def combine_file_over_nodes(plan, node_names, lines, filename):
 
 
 # This builds the binary and we throw this away
-def build(plan):
+def build(plan, image, builds_image_live):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
 
     plan.add_service(
         name = "builder",
         config = ServiceConfig(
-            image = SEI_IMAGE,
+            image = image,
             entrypoint = ["sleep", "999999"],
             files = {
                 "/tmp/cloner": cloner,
@@ -256,6 +261,14 @@ def build(plan):
             command = ["/tmp/cloner/cloner.sh"],
         )        
     )
+
+    if not builds_image_live:
+        plan.exec(
+            service_name = node,
+            recipe = ExecRecipe(
+                command = ["git", "checkout", "3.0.1"]
+            )
+        )
 
     plan.exec(
         service_name = "builder",
