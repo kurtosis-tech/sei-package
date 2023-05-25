@@ -10,6 +10,7 @@ MAIN_DIR = MAIN_BASE + "sei-chain/"
 PERSISTENT_PEERS_PATH = "build/generated/persistent_peers.txt"
 GENESIS_ACCOUNTS_PATH = "build/generated/genesis_accounts.txt"
 EXPORTED_KEYS_PATH = "build/generated/exported_keys/"
+GENESIS_JSON_PATH = "build/generated/genesis.json"
 
 ZEROTH_NODE = 0
 
@@ -23,6 +24,9 @@ def run(plan , args):
     peers = []
 
     configurer = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/configurer.sh")
+    genesis = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/genesis.sh")
+    step45 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_4_and_5.sh")
+    step6 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_6.sh")
 
     built = build(plan)
 
@@ -45,7 +49,10 @@ def run(plan , args):
             },
             files = {
                 MAIN_BASE: built,
-                "/tmp/configurer": configurer
+                "/tmp/configurer": configurer,
+                "/tmp/genesis": genesis,
+                "/tmp/step45": step45,
+                "/tmp/step6": step6,
             },
             entrypoint = ["sleep", "9999999"]
         )
@@ -92,42 +99,87 @@ def run(plan , args):
         peers.append(peer)
 
 
+    # copy over genesis accounts to node0
     write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
     read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], GENESIS_ACCOUNTS_PATH)
 
+    # copy over persistent peers to node 0
     write_together_node0(plan, peers, PERSISTENT_PEERS_PATH)
     read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], PERSISTENT_PEERS_PATH)
 
-    copy_file_in_dir(plan, source_service_name, dir_name, target_service_name, target_dir_name)
-
-    for node in node_names[1:]:
-        copy_file_in_dir(plan, EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE], EXPORTED_KEYS_PATH)
-
+    # copy over exported keys to node 0
+    for source_node in node_names[1:]:
+        copy_only_file_in_dir(plan, EXPORTED_KEYS_PATH, source_node, EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE])
+    
+    # verify exported keys
     plan.exec(
-        node_names[ZEROTH_NODE],
-        command = ["ls", EXPORTED_KEYS_PATH]
+        service_name = node_names[ZEROTH_NODE],
+        recipe = ExecRecipe(
+            command = ["ls", EXPORTED_KEYS_PATH],
+        )
     )
 
-    # run step 2 & 3
-    # copy over the genesis.json from node 0 to everywhere to the right place
+    # run step 2 & 3 on zero'th node
+    plan.exec(
+        service_name = node_names[ZEROTH_NODE],
+        recipe = ExecRecipe(
+            command = ["/tmp/genesis/genesis.sh"],
+        )
+    )
 
-    # run step 4, 5 & 6 on all nodes in any order
+    copy_genesis_json_to_other_nodes(plan, node_names)
+    
+    # run step 4 and 5 everywhere
+    for name in node_names:
+        plan.exec(
+            service_name = name,
+            recipe = ExecRecipe(
+                command = ["/tmp/step45/step_4_and_5.sh"]
+            )
+        )
+
+    # run step 6 after 4 & 5 are done at both places
+    for name in node_names:
+        plan.exec(
+            service_name = name,
+            recipe = ExecRecipe(
+                command = ["/tmp/step6/step_6.sh"]
+            )
+        )
 
 
-# this assumes there is only one file in that dir
-def copy_file_in_dir(plan, source_service_name, dir_name, target_service_name, target_dir_name)):
+def copy_genesis_json_to_other_nodes(plan, node_names):
+    plan.exec(
+        service_name = node_names[ZEROTH_NODE],
+        recipe = ExecRecipe(
+            command = ["mkdir", "-p", "/tmp/genesis_json/"]
+        )        
+    )    
+    plan.exec(
+        service_name = node_names[ZEROTH_NODE],
+        recipe = ExecRecipe(
+            command = ["cp", GENESIS_JSON_PATH, "/tmp/genesis_json/"]
+        )        
+    )
+    for target_node in node_names[1:]:
+        copy_only_file_in_dir(plan, node_names[ZEROTH_NODE], "/tmp/genesis_json/", target_node, "build/generated/")
+
+
+def copy_only_file_in_dir(plan, source_service_name, dir_name, target_service_name, target_dir_name):
     filename_response = plan.exec(
-        service_name = service_name,
+        service_name = source_service_name,
         recipe = ExecRecipe(
             command = ["ls", dir_name]
         )
     )
 
     filename = filename_response["output"]
-    filedata = read_file_from_service(source_service_name, dir_name + filename_response)
+    filedata = read_file_from_service(plan, source_service_name, dir_name + filename)
 
-    write_together_node0
-
+    plan.exec(
+        service_name = source_service_name,
+        recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" > {1}{2}'.format(filedata, target_dir_name, filename)])
+    )
 
 def read_file_from_service(plan, service_name, filename):
     output = plan.exec(
