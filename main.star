@@ -104,8 +104,7 @@ def run(plan , args):
     read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], GENESIS_ACCOUNTS_PATH)
 
     # copy over persistent peers to node 0
-    write_together_node0(plan, peers, PERSISTENT_PEERS_PATH)
-    read_file_from_service_with_nl(plan, node_names[ZEROTH_NODE], PERSISTENT_PEERS_PATH)
+    combine_file_over_nodes(plan, node_names, peers, PERSISTENT_PEERS_PATH)    
 
     # copy over exported keys to node 0
     for source_node in node_names[1:]:
@@ -209,6 +208,16 @@ def write_together_node0(plan, lines, filename):
             recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" >> {1}'.format(line, filename)])
         )
 
+
+def combine_file_over_nodes(plan, node_names, lines, filename):
+    for index, target_node_name in enumerate(node_names):
+        for line in lines[0:index] + lines[index+1:]:
+            plan.exec(
+                service_name = target_node_name,
+                recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" >> {1}'.format(line, filename)])
+            )
+        # we verify things were properly written
+        read_file_from_service_with_nl(plan, target_node_name, filename)
 
 # This builds everything and we throw this away
 def build(plan):
