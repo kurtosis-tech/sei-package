@@ -21,7 +21,7 @@ def run(plan , args):
 
     built = build(plan)
 
-    for index in range(0, cluster_size+1):
+    for index in range(0, cluster_size):
         env_vars_for_node = {}
         env_vars_for_node["ID"] = str(index)
         env_vars_for_node["CLUSTER_SIZE"] = str(cluster_size)
