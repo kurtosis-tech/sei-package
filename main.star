@@ -91,10 +91,10 @@ def run(plan , args):
 
 
     write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
-    plan.print(read_file_from_service(plan, node_names[0], GENESIS_ACCOUNTS_PATH))
+    read_file_from_service(plan, node_names[0], GENESIS_ACCOUNTS_PATH)
 
     write_together_node0(plan, genesis_accounts, PERSISTENT_PEERS_PATH)
-    plan.print(read_file_from_service(plan, node_names[0], PERSISTENT_PEERS_PATH))
+    read_file_from_service(plan, node_names[0], PERSISTENT_PEERS_PATH)
 
 
     # store all build/generated/persistent_peers.txt
