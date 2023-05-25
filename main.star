@@ -108,7 +108,7 @@ def run(plan , args):
 
     # copy over exported keys to node 0
     for source_node in node_names[1:]:
-        copy_only_file_in_dir(plan, EXPORTED_KEYS_PATH, source_node, EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE])
+        copy_only_file_in_dir(plan, source_node, EXPORTED_KEYS_PATH, , EXPORTED_KEYS_PATH, node_names[ZEROTH_NODE])
     
     # verify exported keys
     plan.exec(
@@ -176,9 +176,12 @@ def copy_only_file_in_dir(plan, source_service_name, dir_name, target_service_na
     filedata = read_file_from_service(plan, source_service_name, dir_name + filename)
 
     plan.exec(
-        service_name = source_service_name,
+        service_name = target_service_name,
         recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" > {1}{2}'.format(filedata, target_dir_name, filename)])
     )
+
+    read_file_from_service(plan, target_service_name, "{}{}".format(target_dir_name, filename))
+
 
 def read_file_from_service(plan, service_name, filename):
     output = plan.exec(
