@@ -81,8 +81,8 @@ def run(plan , args):
         peers.append(peer)
         node_names.append(name)
 
-    write_together_node1(plan, node_names[0], genesis_accounts, "build/generated/genesis_accounts.txt")
-    plan.print(read_file_from_service(node_names[0], "build/generated/genesis_accounts.txt"))
+    write_together_node0(plan, genesis_accounts, "build/generated/genesis_accounts.txt")
+    plan.print(read_file_from_service(plan, node_names[0], "build/generated/genesis_accounts.txt"))
 
     # store all build/generated/persistent_peers.txt
     # build/generated/genesis_accounts.txt
@@ -111,7 +111,7 @@ def write_together_node0(plan, lines, filename):
     for line in lines[0:]:
         plan.exec(
             service_name = "node0",
-            command = ["echo", "\"{}\"".format(line), ">>", filename]
+            recipe = ExecRecipe(command = ["echo", "\"{}\"".format(line), ">>", filename])
         )
 
 
