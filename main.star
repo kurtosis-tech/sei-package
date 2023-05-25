@@ -18,7 +18,7 @@ ZEROTH_NODE = 0
 
 def run(plan , args):
     image = SEI_PUBLISHED_IMAGE
-    builds_image_live = arge.get("builds_image_live", False)
+    builds_image_live = args.get("builds_image_live", False)
     if builds_image_live:
         image = SEI_IMAGE
 
