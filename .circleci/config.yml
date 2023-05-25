@@ -25,7 +25,7 @@ jobs:
           sudo apt install kurtosis-cli
       
       - run: |
-          kurtosis run . --enclave sei-enclave '{"cluster_size": 6}'
+          kurtosis run . --enclave sei-enclave '{"cluster_size": 100}'
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
