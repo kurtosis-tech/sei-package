@@ -77,7 +77,7 @@ def run(plan , args):
         account = read_file_from_service(plan, name, "build/generated/genesis_accounts.txt")
         peer = read_file_from_service(plan, name, "build/generated/persistent_peers.txt")
 
-        genesis_accounts.append(output)
+        genesis_accounts.append(account)
         peers.append(peer)
         node_names.append(name)
 
@@ -96,7 +96,7 @@ def run(plan , args):
 
 def read_file_from_service(plan, service_name, filename):
     output = plan.exec(
-        service_name = name,
+        service_name = service_name,
         recipe = ExecRecipe(
             command = ["cat", filename]
         )
