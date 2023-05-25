@@ -93,7 +93,7 @@ def run(plan , args):
     write_together_node0(plan, genesis_accounts, GENESIS_ACCOUNTS_PATH)
     read_file_from_service(plan, node_names[0], GENESIS_ACCOUNTS_PATH)
 
-    write_together_node0(plan, genesis_accounts, PERSISTENT_PEERS_PATH)
+    write_together_node0(plan, peers, PERSISTENT_PEERS_PATH)
     read_file_from_service(plan, node_names[0], PERSISTENT_PEERS_PATH)
 
 
@@ -124,7 +124,7 @@ def write_together_node0(plan, lines, filename):
     for line in lines[1:]:
         plan.exec(
             service_name = "node0",
-            recipe = ExecRecipe(command = ["/bin/sh", "-c", "echo $'\n{0}' >> {1}".format(line, filename)])
+            recipe = ExecRecipe(command = ["/bin/sh", "-c", "echo '{0}' >> {1}".format(line, filename)])
         )
 
 
