@@ -1,6 +1,7 @@
 SEI_IMAGE = "sei-chain/localnode"
 SEI_PUBLISHED_IMAGE = "h4ck3rk3y/localnode:3.0.1"
 SEI_NODE_PREFIX = "node"
+SEI_DEFAULT_GIT_TAG = "3.0.1"
 
 DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
@@ -17,7 +18,9 @@ GENTX_PATH = "build/generated/gentx/"
 ZEROTH_NODE = 0
 
 def run(plan , args):
-    image = SEI_PUBLISHED_IMAGE
+    image = args.get("image", SEI_PUBLISHED_IMAGE)
+    git_tag = args.get("git_tag", SEI_DEFAULT_GIT_TAG)
+
     builds_image_live = args.get("builds_image_live", False)
     if builds_image_live:
         image = SEI_IMAGE
@@ -293,7 +296,7 @@ def combine_file_over_nodes(plan, node_names, lines, filename):
 
 
 # This builds the binary and we throw this away
-def build(plan, image, builds_image_live):
+def build(plan, image, builds_image_live, git_tag):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
 
@@ -320,7 +323,7 @@ def build(plan, image, builds_image_live):
         plan.exec(
             service_name = "builder",
             recipe = ExecRecipe(
-                command = ["git", "checkout", "3.0.1"]
+                command = ["git", "checkout", git_tag]
             )
         )
 
