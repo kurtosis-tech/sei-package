@@ -324,10 +324,11 @@ def build(plan, image, builds_image_live):
             )
         )
 
+    # remove the .git folder to trim down the directory
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
-            command = ["date"],
+            command = ["rm", "-rf", ".git"]
         )
     )
 
@@ -335,13 +336,6 @@ def build(plan, image, builds_image_live):
         service_name = "builder",
         recipe = ExecRecipe(
             command = ["/tmp/builder/builder.sh"],
-        )
-    )
-
-    plan.exec(
-        service_name = "builder",
-        recipe = ExecRecipe(
-            command = ["date"],
         )
     )
 
