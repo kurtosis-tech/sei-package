@@ -37,7 +37,7 @@ def run(plan , args):
     step45 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_4_and_5.sh")
     step6 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_6.sh")
 
-    built = build(plan, image, builds_image_live)
+    built = build(plan, image, builds_image_live, git_tag)
 
     for index in range(0, cluster_size):
         env_vars_for_node = {}
