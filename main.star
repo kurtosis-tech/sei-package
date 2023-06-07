@@ -1,6 +1,6 @@
 SEI_IMAGE = "sei-chain/localnode"
 SEI_PUBLISHED_IMAGE = "h4ck3rk3y/localnode:3.0.1"
-SEI_NODE_PREFIX = "node"
+SEI_NODE_PREFIX = "sei-node-"
 SEI_DEFAULT_GIT_TAG = "3.0.1"
 
 DEFAULT_CLUSTER_SIZE = 4
