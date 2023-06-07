@@ -1,7 +1,7 @@
 SEI_IMAGE = "sei-chain/localnode"
 SEI_PUBLISHED_IMAGE = "h4ck3rk3y/localnode:3.0.1"
 SEI_NODE_PREFIX = "sei-node-"
-SEI_DEFAULT_GIT_TAG = "3.0.1"
+SEI_DEFAULT_GIT_REF = "3.0.1"
 
 DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
@@ -19,7 +19,7 @@ ZEROTH_NODE = 0
 
 def run(plan , args):
     image = args.get("image", SEI_PUBLISHED_IMAGE)
-    git_tag = args.get("git_tag", SEI_DEFAULT_GIT_TAG)
+    git_ref = args.get("git_ref", SEI_DEFAULT_GIT_REF)
 
     builds_image_live = args.get("builds_image_live", False)
     if builds_image_live:
@@ -37,7 +37,7 @@ def run(plan , args):
     step45 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_4_and_5.sh")
     step6 = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/step_6.sh")
 
-    built = build(plan, image, builds_image_live, git_tag)
+    built = build(plan, image, builds_image_live, git_ref)
 
     for index in range(0, cluster_size):
         env_vars_for_node = {}
@@ -278,7 +278,7 @@ def read_file_from_service_with_nl(plan, service_name, filename):
 def write_together_node0(plan, lines, filename):
     for line in lines[1:]:
         plan.exec(
-            service_name = "node0",
+            service_name = "{}0".format(SEI_NODE_PREFIX),
             recipe = ExecRecipe(command = ["/bin/sh", "-c", 'echo "{0}" >> {1}'.format(line, filename)])
         )
 
@@ -296,7 +296,7 @@ def combine_file_over_nodes(plan, node_names, lines, filename):
 
 
 # This builds the binary and we throw this away
-def build(plan, image, builds_image_live, git_tag):
+def build(plan, image, builds_image_live, git_ref):
     cloner = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/cloner.sh")
     builder = plan.upload_files("github.com/kurtosis-tech/sei-package/static_files/builder.sh")
 
@@ -323,7 +323,7 @@ def build(plan, image, builds_image_live, git_tag):
         plan.exec(
             service_name = "builder",
             recipe = ExecRecipe(
-                command = ["git", "checkout", git_tag]
+                command = ["git", "checkout", git_ref]
             )
         )
 
