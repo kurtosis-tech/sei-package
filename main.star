@@ -327,6 +327,22 @@ def build(plan, image, builds_image_live, git_ref):
             )
         )
 
+    # remove the .git folder to trim down the directory
+    plan.exec(
+        service_name = "builder",
+        recipe = ExecRecipe(
+            command = ["rm", "-rf", ".git"]
+        )
+    )
+
+    # but git repo is required for scripts
+    plan.exec(
+        service_name = "builder",
+        recipe = ExecRecipe(
+            command = ["git", "init"]
+        )
+    )
+
     plan.exec(
         service_name = "builder",
         recipe = ExecRecipe(
