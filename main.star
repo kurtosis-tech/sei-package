@@ -6,6 +6,7 @@ SEI_DEFAULT_GIT_REF = "3.0.4"
 
 DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
+DEFAULT_INVARIANT_CHECK_INTERVAL = 10
 
 MAIN_BASE = "/sei-protocol/"
 MAIN_DIR = MAIN_BASE + "sei-chain/"
@@ -29,6 +30,7 @@ def run(plan , args):
 
     cluster_size = args.get("cluster_size", DEFAULT_CLUSTER_SIZE)
     num_accounts = args.get("num_accounts", DEFAULT_NUM_ACCOUNTS)
+    invariant_check_interval = args.get("invariant_check_interval", DEFAULT_INVARIANT_CHECK_INTERVAL)
 
     node_names = []
     genesis_accounts = []
@@ -46,6 +48,7 @@ def run(plan , args):
         env_vars_for_node["ID"] = str(index)
         env_vars_for_node["CLUSTER_SIZE"] = str(cluster_size)
         env_vars_for_node["NUM_ACCOUNTS"] = str(num_accounts)
+        env_vars_for_node["INVARIANT_CHECK_INTERVAL"] = str(invariant_check_interval)
 
 
         config = ServiceConfig(
