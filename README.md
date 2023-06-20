@@ -10,7 +10,7 @@ By default this starts a 4 node cluster with 10 accounts each; you can change it
 arguments like -
 
 ```bash
-kurtosis run github.com/kurtosis-tech/sei-package '{"cluster_size": 4, "num_accounts": 10}'
+kurtosis run github.com/kurtosis-tech/sei-package '{"cluster_size": 4, "num_accounts": 10, "genesis_overrides": [".consensus_params[\"block\"][\"max_gas\"]=\"1235000000000\""]}'
 ```
 
 This starts the SEI node and the price feeder on each node

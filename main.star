@@ -7,6 +7,7 @@ SEI_DEFAULT_GIT_REF = "3.0.4"
 DEFAULT_CLUSTER_SIZE = 4
 DEFAULT_NUM_ACCOUNTS = 10
 DEFAULT_INVARIANT_CHECK_INTERVAL = 10
+DEFAULT_GENESIS_OVERRIDES = []
 
 MAIN_BASE = "/sei-protocol/"
 MAIN_DIR = MAIN_BASE + "sei-chain/"
@@ -23,6 +24,7 @@ def run(plan , args):
     image = args.get("image", SEI_PUBLISHED_IMAGE)
     git_url = args.get("git_url", SEI_DEFAULT_GIT_URL)
     git_ref = args.get("git_ref", SEI_DEFAULT_GIT_REF)
+    genesis_overrides = args.get("genesis_overrides", DEFAULT_GENESIS_OVERRIDES)
 
     builds_image_live = args.get("builds_image_live", False)
     if builds_image_live:
@@ -150,7 +152,7 @@ def run(plan , args):
         )
     )
 
-    copy_genesis_json_to_other_nodes(plan, node_names)
+    copy_genesis_json_to_other_nodes(plan, node_names, genesis_overrides)
 
     # run step 4 and 5 everywhere
     for name in node_names:
@@ -218,9 +220,22 @@ def print_some_logs(plan, node_names):
             )
         )
 
+def override_genesis_json(plan, node_names, override):
+    plan.exec(
+        service_name = node_names[ZEROTH_NODE],
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c" , "cat /tmp/genesis_json/genesis.json | jq '{}' > /tmp/genesis_json/tmp_genesis.json".format(override)]
+        )
+    )
+    plan.exec(
+        service_name = node_names[ZEROTH_NODE],
+        recipe = ExecRecipe(
+            command = ["mv" , "/tmp/genesis_json/tmp_genesis.json", "/tmp/genesis_json/genesis.json"]
+        )
+    )
 
 # copies genesis.json from node0 to all other nodes
-def copy_genesis_json_to_other_nodes(plan, node_names):
+def copy_genesis_json_to_other_nodes(plan, node_names, overrides):
     plan.exec(
         service_name = node_names[ZEROTH_NODE],
         recipe = ExecRecipe(
@@ -233,6 +248,15 @@ def copy_genesis_json_to_other_nodes(plan, node_names):
             command = ["cp", GENESIS_JSON_PATH, "/tmp/genesis_json/"]
         )
     )
+    for override in overrides:
+       override_genesis_json(plan, node_names, override)
+
+    plan.exec(
+        service_name = node_names[ZEROTH_NODE],
+        recipe = ExecRecipe(
+            command = ["/bin/sh", "-c", "cat /tmp/genesis_json/genesis.json | jq ."]
+        )
+    ) 
     for target_node in node_names[1:]:
         copy_only_file_in_dir(plan, node_names[ZEROTH_NODE], "/tmp/genesis_json/", target_node, "build/generated/")
 
